@@ -36,6 +36,7 @@ export const makeConsole = (options?: Partial<IMakeOptions>): IConsole => {
 
             methods[type] = (...args: Array<any>) => {
                 const list = addNamespace(args);
+
                 setToConsole(list);
                 setToKeeper(list);
             };
@@ -48,5 +49,33 @@ export const makeConsole = (options?: Partial<IMakeOptions>): IConsole => {
         }
     ) as IConsole;
 };
+
+export function makeOptions(
+    logLevel: 'verbose' | 'error' | 'production',
+    namespace?: string
+): Partial<IMakeOptions> {
+    switch (logLevel) {
+        case 'production':
+            return {
+                keepMessageTypes: ['error'],
+                logMessageTypes: [],
+                namespace,
+            };
+        case 'error':
+            return {
+                keepMessageTypes: ['warn', 'error'],
+                logMessageTypes: ['error'],
+                namespace,
+            };
+        case 'verbose':
+            return {
+                keepMessageTypes: [],
+                logMessageTypes: ALL_TYPES.slice(),
+                namespace,
+            };
+        default:
+            return { ...DEFAULT_MAKE_OPTIONS };
+    }
+}
 
 export default makeConsole;
