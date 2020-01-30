@@ -1,0 +1,32 @@
+{
+  "name": "@waves/client-logs",
+  "version": "0.0.0",
+  "description": "Simple library for logging events",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "husky": "^4.2.1",
+    "lint-staged": "^10.0.5",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.5"
+  },
+  "lint-staged": {
+    "src/**/*.ts?(x)": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm test",
+      "post-commit": "git update-index --again"
+    }
+  }
+}
