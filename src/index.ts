@@ -7,7 +7,6 @@ import {
 import { MessageKeeper } from './MessageKeeper';
 import { DEFAULT_MAKE_OPTIONS, ALL_TYPES } from './constants';
 import { toHash } from './utils/toHash';
-import { concat } from './utils/concat';
 import { identity } from './utils/identity';
 
 export {
@@ -16,6 +15,8 @@ export {
     IMessage,
     IGetMessageOptions,
 } from './interfaces';
+
+declare const VERSION: string;
 
 export const makeConsole = (options?: Partial<IMakeOptions>): IConsole => {
     const makeOptions = { ...DEFAULT_MAKE_OPTIONS, ...(options ?? {}) };
@@ -27,17 +28,17 @@ export const makeConsole = (options?: Partial<IMakeOptions>): IConsole => {
         (methods: any, type: TMessageType) => {
             const addNamespace =
                 makeOptions.namespace != null
-                    ? concat(makeOptions.namespace)
+                    ? (args: any[]): any[] => [makeOptions.namespace, ...args]
                     : identity;
             const setToConsole = logTypes[type] ? console[type] : identity;
             const setToKeeper = keepTypes[type]
-                ? (...args: Array<any>) => keeper.push({ type, args })
+                ? (args: Array<any>): void => keeper.push({ type, args })
                 : identity;
 
-            methods[type] = (...args: Array<any>) => {
+            methods[type] = (...args: Array<any>): void => {
                 const list = addNamespace(args);
 
-                setToConsole(list);
+                setToConsole(...list);
                 setToKeeper(list);
             };
 
@@ -50,31 +51,36 @@ export const makeConsole = (options?: Partial<IMakeOptions>): IConsole => {
     ) as IConsole;
 };
 
+export const version =
+    typeof VERSION !== 'undefined' ? VERSION : 'BUILD_VERSION';
+
 export function makeOptions(
     logLevel: 'verbose' | 'error' | 'production',
     namespace?: string
-): Partial<IMakeOptions> {
+): IMakeOptions {
+    // eslint-disable-next-line default-case
     switch (logLevel) {
         case 'production':
             return {
+                ...DEFAULT_MAKE_OPTIONS,
                 keepMessageTypes: ['error'],
                 logMessageTypes: [],
                 namespace,
             };
         case 'error':
             return {
+                ...DEFAULT_MAKE_OPTIONS,
                 keepMessageTypes: ['warn', 'error'],
                 logMessageTypes: ['error'],
                 namespace,
             };
         case 'verbose':
             return {
+                ...DEFAULT_MAKE_OPTIONS,
                 keepMessageTypes: [],
                 logMessageTypes: ALL_TYPES.slice(),
                 namespace,
             };
-        default:
-            return { ...DEFAULT_MAKE_OPTIONS };
     }
 }
 

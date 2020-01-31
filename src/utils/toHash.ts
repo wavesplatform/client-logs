@@ -3,5 +3,7 @@ export const toHash = <T extends string>(
 ): Record<T, boolean> => {
     return array.reduce((acc, item) => {
         acc[item] = true;
+
+        return acc;
     }, Object.create(null));
 };

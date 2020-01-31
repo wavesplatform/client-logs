@@ -3,7 +3,7 @@ node_modules
 .idea
 _*
 es
-cjs
+cj
 coverage
 .DS_Store
 src/**/*.d.ts
